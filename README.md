@@ -240,7 +240,7 @@ Détails : `references/scan.md`.
 
 ## Règles sur une page web
 Quand les règles ne sont publiées que sur une page web (Google Sites, Notion, site de l'éditeur), le PDF fait
-par la skill [recherche-regles-jeu](https://github.com/vinchy1/recherche-regles-jeu) n'est pas recouvert : la
+par la skill [recherche-regles-jeu](https://github.com/notoriousFabb/recherche-regles-jeu) n'est pas recouvert : la
 page elle-même est traduite (`page_web.py` liste ses morceaux de texte dans l'ordre d'affichage, puis remet le
 français à leur place), et remise en PDF avec le même script (`page_pdf.py --garder` garde la page et ses
 images). Le livret français a exactement la présentation du site, sans police réduite ni texte condensé.
@@ -356,3 +356,5 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
 - Skill initiée par [notoriousFabb](https://github.com/notoriousFabb/traduction-regles-jeu), optimisée et complétée par
   [vinchy1](https://github.com/vinchy1/traduction-regles-jeu) ; cette version par vinchy1 y ajoute la traduction depuis
   toutes les langues, les livrets scannés, l'organisation en dossiers, les contrôles automatiques, la relecture du texte et les agents relecteurs.
+- Les apports de vinchy1 jusqu'au 26/10/2026 (version anglaise des livrets, rendu « recomposer », moins de jetons…) sont
+  repris ici ; il poursuit de son côté avec le plugin [regles-jeu](https://github.com/vinchy1/regles-jeu).
