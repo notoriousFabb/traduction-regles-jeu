@@ -52,6 +52,8 @@ un livret à problème est mis de côté et signalé.
    cas raté. Lire `references/pieges.md` avant. Retouches du spec avec l'outil d'édition (pas `sed`).
 4. **Construire** : `python -X utf8 build.py sortie.pdf`. « ERREUR : » = spec à corriger. Journal : « police
    réduite », « DÉBORDE », icônes, **« TEXTE NON TRADUIT »** (traduire, ou `IGNORE`), **« À VÉRIFIER »**.
+   - **Livret à fond sombre** : une version économe en encre à imprimer est possible **en plus**, jamais
+     d'office — seulement si l'utilisateur la demande : `references/encre.md`.
 5. **Relire** — deux agents lancés **en parallèle** (un message, deux appels Agent). Messages **courts** : les
    agents ont leur méthode ; donner seulement les chemins, le vocabulaire choisi en une ligne, les endroits à
    regarder et les particularités (spec bilingue, scan, rendu recomposé) :
@@ -62,9 +64,10 @@ un livret à problème est mis de côté et signalé.
    correction → regarder soi-même la seule zone modifiée, sans relancer les agents.
 6. **Livrer** : écrire `NOTES.md` (langue d'origine, éditeur, type, polices, vocabulaire, choix, compromis,
    astuces ; garder « Sources »), puis `python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>"` (`--remplacer`
-   seulement avec l'accord de l'utilisateur) : original déplacé, `SRC` mis à jour, dossier allégé, reconstruction,
-   `<nom>_FR.pdf` (et `_EN.pdf` si spec bilingue), index. Sans spec.py (page web recréée, livret recomposé) :
-   `livrer.py "<outils>" --original "<livret>" --pdf <fr.pdf> [--pdf-en <en.pdf>] --type "<type>"`.
+   seulement avec l'accord de l'utilisateur ; `--encre` livre en plus `<nom>_FR_encre.pdf`) : original déplacé,
+   `SRC` mis à jour, dossier allégé, reconstruction, `<nom>_FR.pdf` (et `_EN.pdf` si spec bilingue), index.
+   Sans spec.py (page web recréée, livret recomposé) : `livrer.py "<outils>" --original "<livret>"
+   --pdf <fr.pdf> [--pdf-en <en.pdf>] [--pdf-encre <encre.pdf>] --type "<type>"`.
    Termes généraux nouveaux → `references/glossaire.md`. Résumer : fichiers, vocabulaire, compromis.
 
 ## Économiser les jetons

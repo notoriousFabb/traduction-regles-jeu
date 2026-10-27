@@ -21,7 +21,8 @@ côte : `T("fr", "en")`) — l'exemple de CMYK (dépliant de 12 volets, 2 pages,
   `("p", html)` paragraphe, `("li", html)` puce, `("box", titre, html)` encadré à titre sur le cadre,
   `("sp", n)` espace, `("logo",)` / `("fin",)` page de titre et crédits (à réécrire pour chaque jeu).
 Une seule taille de texte pour tout le livret : la plus grande qui tient dans chaque volet (le journal la donne).
-Construire : `python -X utf8 noir.py fr sortie.pdf` puis `noir.py en sortie_en.pdf`.
+Construire : `python -X utf8 noir.py fr sortie.pdf` puis `noir.py en sortie_en.pdf`. Version économe en encre
+à imprimer (fond blanc), si l'utilisateur la demande : `noir.py fr sortie_encre.pdf --clair` (`encre.md`).
 
 ## Relire et livrer
 - Relecture : le relecteur texte compare `textes.py` (FR et EN) au texte d'origine — relu à la main sur les

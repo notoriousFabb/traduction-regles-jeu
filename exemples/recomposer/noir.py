@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """Livret CMYK recomposé à neuf (fond noir, texte blanc, 12 volets comme le dépliant d'origine, aucune image
 du scan) d'après textes.py.
-Usage : python -X utf8 noir.py fr|en sortie.pdf
+Usage : python -X utf8 noir.py fr|en sortie.pdf [--clair]
+--clair : version économe en encre à imprimer (fond blanc, texte foncé) — à construire en plus du livret
+normal, dans un autre fichier, et seulement si l'utilisateur le demande.
 Une seule taille de texte (≤ BASE), la plus grande qui tient dans tous les volets ; le journal la donne.
 
 EXEMPLE de la skill (references/recomposer.md) : à copier dans _outils/<Jeu>/ avec textes.py, puis adapter le
@@ -14,13 +16,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(HERE)
 import textes
 
-LANG, OUT = sys.argv[1], sys.argv[2]
+CLAIR = "--clair" in sys.argv  # version économe en encre : fond blanc, texte foncé
+ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
+LANG, OUT = ARGS[0], ARGS[1]
 W, H = 456, 1000                      # format du dépliant scanné (points)
 COLS = [(0, 228), (228, 456)]
 ROWS = [(0, 333), (333, 667), (667, 1000)]
 M = 11                                # marge intérieure d'un volet
 BASE = 9.6                            # taille de départ du texte courant
 BG, FG, GREY = (0.05, 0.05, 0.05), (0.95, 0.95, 0.95), (0.3, 0.3, 0.3)
+if CLAIR:  # fond blanc : couleurs permutées ; le gris est assombri plutôt qu'inversé, pour rester lisible
+    BG, FG, GREY = (1, 1, 1), (0.05, 0.05, 0.05), (0.45, 0.45, 0.45)
+HEX = "#%02x%02x%02x" % tuple(round(c * 255) for c in FG)  # couleur du texte, pour le CSS de box()
 ARCH = pymupdf.Archive("ff")
 CSS = """
 @font-face{font-family:Sg;src:url(segoeui.ttf);}
@@ -45,7 +52,7 @@ def tr(v):
 
 def box(page, rect, html, size, bold=False, align="left", lead=1.28, fam="Sg", ital=False):
     """Pose html dans rect (haut fixé) ; rend la hauteur utilisée, ou None si ça ne tient pas."""
-    st = (f"font-family:{fam};font-size:{size}pt;line-height:{lead};color:#f2f2f2;text-align:{align};"
+    st = (f"font-family:{fam};font-size:{size}pt;line-height:{lead};color:{HEX};text-align:{align};"
           f"font-weight:{'bold' if bold else 'normal'};font-style:{'italic' if ital else 'normal'};")
     spare, _ = page.insert_htmlbox(rect, f'<div style="{st}">{html}</div>', css=CSS, archive=ARCH, scale_low=1)
     return None if spare < 0 else rect.height - spare

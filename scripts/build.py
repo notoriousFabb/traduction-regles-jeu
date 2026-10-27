@@ -2,7 +2,10 @@
 """Reconstruit un livret de règles en français en gardant chaque image et chaque tracé à sa place.
 
 Moteur générique : tout ce qui est propre à un jeu (PDF source, polices, colonnes, mini-cartes) est dans spec.py
-(voir spec_modele.py). Usage : python -X utf8 build.py sortie.pdf
+(voir spec_modele.py). Usage : python -X utf8 build.py sortie.pdf [--fond-clair]
+--fond-clair : version économe en encre à imprimer — sur les pages à fond sombre, le fond est retiré et les
+couleurs claires deviennent foncées (encre.py) ; les illustrations gardent les leurs. À construire en plus du
+livret normal, dans un autre fichier, et seulement si l'utilisateur le demande.
 Le journal (police réduite, débordements, icônes, texte non traduit) est affiché et enregistré dans
 <sortie>_journal.txt."""
 import math, os, re, sys
@@ -36,7 +39,15 @@ IGNORE = getattr(spec, "IGNORE", {})
 AVANT_TEXTE = getattr(spec, "AVANT_TEXTE", None)  # f(page, pno, log) : dessin sous le français (bandeau élargi…)
 INCLINEES = getattr(spec, "INCLINEES", [])  # [(page, texte d'origine, français)] : étiquettes penchées
 CONTOURS = getattr(spec, "CONTOURS", {})  # {page: [(x0, y0, x1, y1)]} : lettres doublées d'un contour en tracés
-OUT = sys.argv[1] if len(sys.argv) > 1 else "out_fr.pdf"
+ENCRE = "--fond-clair" in sys.argv  # version économe en encre : fond sombre retiré, couleurs claires foncées
+ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
+OUT = ARGS[0] if ARGS else "out_fr.pdf"
+CLAIR = False  # page en cours traitée en fond clair (les pages déjà claires sont laissées telles quelles)
+if ENCRE:
+    try:
+        import encre
+    except ImportError:
+        fail("encre.py absent du dossier (option --fond-clair) : le recopier depuis scripts/ de la skill")
 FF = os.path.join(HERE, "ff")
 MARK = "¤"
 BULLET = re.compile(r"^\s*([•●○〇◆◇■□▪▶►・\u2460-\u2473\u2776-\u277f]|\d+\.)\s*")
@@ -71,6 +82,27 @@ def face_file(fam, bold=False, ital=False):
         if k in FACES:
             return FACES[k]
     return next(iter(FACES.values()))
+
+
+def coul(c):
+    """Couleur d'un tracé ou d'un texte d'origine (triplet 0-1, None accepté) : clarté inversée si la page est
+    traitée en fond clair (encre.py), inchangée sinon."""
+    return encre.inverse(tuple(c)) if CLAIR and c else c
+
+
+def coul_txt(c):
+    """Couleur d'un texte reposé (triplet 0-1) : inversée et rendue lisible sur blanc si la page est en fond
+    clair."""
+    return encre.texte(tuple(c)) if CLAIR else c
+
+
+def coul_hex(c):
+    """Idem pour une couleur « #rrggbb » (celle du texte, lue sur l'original par para_style)."""
+    if not CLAIR:
+        return c
+    v = int(c[1:], 16)
+    return "#%02x%02x%02x" % tuple(round(x * 255) for x in
+                                   encre.texte(((v >> 16) / 255, (v >> 8 & 255) / 255, (v & 255) / 255)))
 
 
 CSS = spec.CSS + f"""
@@ -455,7 +487,7 @@ def draw_icon(page, ic, cx, cy, k=1.0):
                 elif it[0] == "qu":
                     q = it[1]
                     sh.draw_quad(pymupdf.Quad(mv(q.ul), mv(q.ur), mv(q.ll), mv(q.lr)))
-            sh.finish(fill=dr.get("fill"), color=dr.get("color"), width=(dr.get("width") or 0) * k,
+            sh.finish(fill=coul(dr.get("fill")), color=coul(dr.get("color")), width=(dr.get("width") or 0) * k,
                       even_odd=dr.get("even_odd", False), closePath=dr.get("closePath", False),
                       fill_opacity=dr.get("fill_opacity") or 1)
             sh.commit()
@@ -573,7 +605,7 @@ def draw_tilted(page, todo, log):
         o = pymupdf.Point(s["origin"][0] + c * shift, s["origin"][1] + sn * shift)
         col = s["color"]
         page.insert_text(o, fr, fontsize=size, fontname="Inc" + re.sub(r"\W", "", os.path.splitext(face_file(*fcode(s)))[0])[:20],
-                         fontfile=ff, color=((col >> 16) / 255, (col >> 8 & 255) / 255, (col & 255) / 255),
+                         fontfile=ff, color=coul_txt(((col >> 16) / 255, (col >> 8 & 255) / 255, (col & 255) / 255)),
                          morph=(o, pymupdf.Matrix(-math.degrees(math.atan2(sn, c)))))
         log.append(f"page {page.number} : étiquette inclinée « {fr} » (taille {size:.1f})")
 
@@ -589,6 +621,9 @@ for pno in {p for p, en, fr in INCLINEES} | set(CONTOURS):
 
 for pno, flows in sorted(by_page.items()):
     page = doc[pno]
+    CLAIR = ENCRE and encre.sombre(src[pno])
+    if ENCRE and not CLAIR:
+        log.append(f"page {pno} : déjà claire, laissée telle quelle")
     lines_of = page_lines(pno)
     XL, XR = column(pno, lines_of)
     auto = pno not in COLUMNS and "*" not in COLUMNS
@@ -674,6 +709,8 @@ for pno, flows in sorted(by_page.items()):
     unpaint_outlines(page, pno, log)
     if AVANT_TEXTE:  # spec hook, drawn after the redactions and under the French text
         AVANT_TEXTE(page, pno, log)
+    if CLAIR:  # après le crochet : ce qu'il a dessiné est éclairci avec le reste de la page
+        encre.eclaircir(doc, page, log)
     draw_tilted(page, tilted, log)
     found = {fr for l, fr in tilted}
     for p, en, fr in INCLINEES:
@@ -695,7 +732,7 @@ for pno, flows in sorted(by_page.items()):
                 lines = p["lines"]
                 fam, bold, ital, size, color = para_style(lines)
                 size *= SIZE_K.get(fam, 1.0)
-                fam, size, color = p.get("fam", fam), p.get("size", size), p.get("color", color)
+                fam, size, color = p.get("fam", fam), p.get("size", size), coul_hex(p.get("color", color))
                 bold, ital = p.get("bold", bold), p.get("ital", ital)
                 if fam not in FAMILIES:
                     fail(f"{tag} : famille « {fam} » inconnue (familles de spec.CSS : {', '.join(sorted(FAMILIES))})")

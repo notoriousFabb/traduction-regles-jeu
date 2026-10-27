@@ -20,7 +20,7 @@ import pymupdf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEXT_SCRIPTS = ["build.py", "commun.py", "controle.py", "dump.py", "polices.py", "side.py", "ranger.py",
-                "livrer.py", "relecture.py"]
+                "livrer.py", "relecture.py", "encre.py"]
 SCAN_SCRIPTS = ["scan.py", "controle.py", "grille.py", "bandes.py", "icone.py", "side.py", "ranger.py", "livrer.py",
                 "ocr.py", "relecture.py"]
 SYMBOLS = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts", "seguisym.ttf")  # ①❶◆★ des scans

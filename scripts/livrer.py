@@ -12,8 +12,12 @@ Usage : python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>" [--langue X] [--e
    (LANGUE=en) et le copie en <Jeu>/<nom>_EN.pdf ;
 5. ajoute ou met à jour la ligne du jeu dans l'index _outils/LISEZMOI.md (langue et éditeur : options, sinon lus
    dans NOTES.md) et signale un NOTES.md manquant.
+Avec --encre : construit et livre en plus <nom>_FR_encre.pdf, version économe en encre à imprimer (fond sombre
+retiré, couleurs claires foncées — build.py --fond-clair) ; seulement si l'utilisateur la demande, et seulement
+pour un livret à texte.
 Avec --pdf (traduction faite sans spec.py : page web recréée en HTML, livret recomposé à neuf…) : étapes 1, 4 et 5
-seulement, avec les PDF donnés (--pdf-en : version anglaise) et le Type donné à l'index (défaut « recréé »).
+seulement, avec les PDF donnés (--pdf-en : version anglaise, --pdf-encre : version économe en encre) et le Type
+donné à l'index (défaut « recréé »).
 N'écrase jamais un fichier existant dans le dossier du jeu sans --remplacer."""
 import ast, datetime, os, re, shutil, subprocess, sys
 
@@ -106,7 +110,7 @@ def indexer(ludo, jeu, tools, typ):
 def livrer_pdf(tools, jeu, ludo, target, replace):
     """Traduction faite sans spec.py : PDF donnés, original déplacé, index."""
     src = os.path.abspath(opt("--original") or fail("--original \"<livret d'origine>\" manque"))
-    pdfs = {"FR": opt("--pdf"), "EN": opt("--pdf-en")}
+    pdfs = {"FR": opt("--pdf"), "EN": opt("--pdf-en"), "FR_encre": opt("--pdf-encre")}
     if not os.path.isfile(src):
         fail(f"livret d'origine introuvable : {src}")
     stem = fr_stem(os.path.splitext(os.path.basename(src))[0])
@@ -121,7 +125,7 @@ def livrer_pdf(tools, jeu, ludo, target, replace):
             shutil.copy(f, os.path.join(target, f"{stem}_{lg}.pdf"))
             print(f"traduction -> {os.path.join(target, f'{stem}_{lg}.pdf')}")
     typ = opt("--type") or "recréé"
-    indexer(ludo, jeu, tools, typ + (" (FR + EN)" if pdfs["EN"] else ""))
+    indexer(ludo, jeu, tools, typ + (" (FR + EN)" if pdfs["EN"] else "") + (" + encre" if pdfs["FR_encre"] else ""))
 
 
 def read_src(spec_path):
@@ -173,6 +177,9 @@ def main():
     scan = os.path.isfile(os.path.join(tools, "scan.py")) and not os.path.isfile(os.path.join(tools, "build.py"))
     engine = "scan.py" if scan else "build.py"
     en = bilingue(spec_path)
+    encre = "--encre" in sys.argv  # version économe en encre, en plus du livret normal
+    if encre and scan:
+        fail("--encre ne vaut que pour un livret à texte : sur un scan, le fond EST l'image scannée")
 
     src, l0, l1 = read_src(spec_path)
     if not os.path.isfile(src):
@@ -181,10 +188,11 @@ def main():
     fr_name = fr_stem(stem) + "_FR.pdf"
     fr_path = os.path.join(target, fr_name)
     en_path = os.path.join(target, fr_stem(stem) + "_EN.pdf")
+    encre_path = os.path.join(target, fr_stem(stem) + "_FR_encre.pdf")
     if en and os.path.normcase(en_path) == os.path.normcase(os.path.join(target, os.path.basename(src))):
         fail(f"la version anglaise écraserait le livret d'origine ({en_path}) — renommer l'original, "
              "par exemple « <nom>_EN_original.pdf », puis relancer")
-    for p in [fr_path] + ([en_path] if en else []):
+    for p in [fr_path] + ([en_path] if en else []) + ([encre_path] if encre else []):
         if os.path.exists(p) and not replace:
             fail(f"{p} existe déjà — relancer avec --remplacer pour l'écraser")
 
@@ -214,10 +222,19 @@ def main():
             if os.path.exists(os.path.join(tools, f)):
                 os.remove(os.path.join(tools, f))
         print(f"version anglaise -> {en_path}")
+    if encre:  # même spec, fond sombre retiré : version à imprimer
+        code, out = run([engine, "sortie_encre.pdf", "--fond-clair"], tools)
+        if code or "ERREUR" in out:
+            fail("la version économe en encre a échoué :\n" + out[-2000:])
+        shutil.move(os.path.join(tools, "sortie_encre.pdf"), encre_path)
+        if os.path.exists(os.path.join(tools, "sortie_encre_journal.txt")):
+            os.remove(os.path.join(tools, "sortie_encre_journal.txt"))
+        print(f"version économe en encre -> {encre_path}")
     print(run(["ranger.py", tools], tools)[1].splitlines()[-1])
 
     # 5. index
-    indexer(ludo, jeu, tools, ("scan" if scan else "texte") + (" (FR + EN)" if en else ""))
+    indexer(ludo, jeu, tools, ("scan" if scan else "texte") + (" (FR + EN)" if en else "")
+            + (" + encre" if encre else ""))
     if tail:
         print("\n" + tail)
 

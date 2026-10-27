@@ -23,6 +23,7 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
 - [Déroulement d'une traduction](#déroulement-dune-traduction)
 - [Livrets scannés](#livrets-scannés)
 - [Règles sur une page web](#règles-sur-une-page-web)
+- [Version économe en encre](#version-économe-en-encre)
 - [Contrôles automatiques et relecture](#contrôles-automatiques-et-relecture)
 - [Coût en jetons et modèles](#coût-en-jetons-et-modèles)
 - [Corriger une traduction déjà faite](#corriger-une-traduction-déjà-faite)
@@ -53,6 +54,8 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
   remplacé par le français, ou traduction placée à côté de chaque page.
 - **Contrôle son propre travail** : texte oublié, chevauchements, débordements, fautes, termes du glossaire non
   respectés, paragraphes anormalement courts.
+- **Produit une version économe en encre** d'un livret à fond sombre, si on la demande : même mise en page, fond
+  blanc, texte foncé, illustrations intactes.
 - **Fait aussi la version anglaise** si on la demande (utile pour un livret japonais) : la même spec contient
   les deux textes, et la livraison produit `<nom>_FR.pdf` et `<nom>_EN.pdf`.
 - **Range tout** : livrets dans un dossier par jeu, outils allégés à part, index des jeux traduits.
@@ -248,6 +251,26 @@ Le texte dessiné dans les images reste dans la langue d'origine. Détails : `re
 
 ---
 
+## Version économe en encre
+Un livret à fond noir ou très sombre vide une cartouche à l'impression. Sur demande — jamais d'office — la
+skill construit **en plus** du livret normal un second PDF prêt à imprimer, même mise en page, fond blanc :
+`<nom>_FR_encre.pdf`. Le livret normal reste la référence.
+
+Page sombre par page sombre (une page déjà claire est laissée telle quelle) :
+- l'image ou l'aplat qui couvre la page n'est plus peint : le papier blanc reste ;
+- les autres couleurs voient leur **clarté inverser à teinte constante** : filet clair → filet foncé, pastille
+  sombre → pastille claire ;
+- les couleurs de **texte** sont en plus assombries tant que le contraste sur blanc est insuffisant, sinon un
+  titre clair resterait pâle et illisible une fois le fond blanc ;
+- les **images gardent leurs couleurs** : illustrations, logos et pictogrammes sont imprimés tels quels. Une
+  illustration sombre reste sombre — c'est voulu, l'économie vient du fond.
+
+Le texte français est posé dans la couleur inversée de l'original : un texte blanc sur fond noir devient noir sur
+blanc sans rien changer au `spec.py`. Un livret recomposé à neuf a son propre mode clair (`noir.py --clair`).
+Les livrets scannés ne sont pas couverts. Détails : `references/encre.md`.
+
+---
+
 ## Contrôles automatiques et relecture
 **Pendant la construction** (`build.py`, `scan.py`, `controle.py`) :
 - **TEXTE NON TRADUIT** : toute ligne d'origine ni remplacée ni volontairement ignorée (`IGNORE`) est listée.
@@ -310,6 +333,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `langues.md` : langue de départ, livrets multilingues, longueur du français selon la langue, texte vertical ;
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
   - `recomposer.md` : livret recomposé à neuf, sans l'image du scan ;
+  - `encre.md` : version économe en encre d'un livret à fond sombre, à imprimer (sur demande seulement) ;
   - `page-web.md` : règles publiées sur une page web (page traduite puis remise en PDF ; page bilingue,
     version anglaise) ;
   - `en-ligne.md` : livret seulement consultable en ligne (Google Drive) : où chercher le PDF, captures de
@@ -330,12 +354,13 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `grille.py` / `bandes.py` : mesures de position sur les scans ;
   - `icone.py` : découpe une icône d'un scan pour la remettre dans le texte français ;
   - `sheet.py` / `side.py` : planche d'aperçu et images côte à côte original / français ;
-  - `relecture.py` : relecture du texte seul ;
+  - `relecture.py` : relecture du texte seul ; `encre.py` : version économe en encre d'un livret à fond sombre ;
   - `page_web.py` : texte d'une page web à traduire, et page française reconstruite ;
-  - `livrer.py` : livraison (version anglaise comprise ; `--pdf` pour une traduction faite sans spec) ;
+  - `livrer.py` : livraison (version anglaise comprise ; `--encre` pour la version économe en encre ; `--pdf`
+    pour une traduction faite sans spec) ;
     `ranger.py` : allègement du dossier d'outils.
 - `exemples/recomposer/` : `noir.py` et `textes.py`, moteur et texte d'un livret recomposé à neuf (CMYK), à copier
-  et adapter.
+  et adapter (`noir.py --clair` : version économe en encre).
 
 ---
 
@@ -348,6 +373,8 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
 - **Lecture automatique des scans** : Windows uniquement ; ailleurs, Claude lit les pages en images (plus cher).
 - **Livrets très longs** : la traduction se fait page par page dans une même session, ce qui reste coûteux ;
   mieux vaut le savoir avant de commencer un livret de 40 pages.
+- **Version économe en encre** : pas pour les livrets scannés, où le fond EST l'image scannée. Un fond fait de
+  nombreux petits pavés, ou posé avec une matrice tournée, est signalé dans le journal plutôt que forcé.
 
 ---
 
