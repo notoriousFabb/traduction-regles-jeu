@@ -62,8 +62,11 @@ def run(args, cwd, langue=None):
 
 
 def bilingue(spec_path):
-    """spec.py qui lit LANGUE dans l'environnement : version anglaise à construire aussi."""
-    return bool(re.search(r"environ(?:\.get)?\s*[\(\[]\s*[\"']LANGUE", open(spec_path, encoding="utf8").read()))
+    """spec.py qui appelle X("fr", "en") : version anglaise à construire aussi (la ligne LANGUE et la fonction X
+    du modèle, restées sans usage, ne suffisent pas)."""
+    tree = ast.parse(open(spec_path, encoding="utf8").read())
+    return any(isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "X"
+               for n in ast.walk(tree))
 
 
 def deplacer_original(src, target, replace):
@@ -178,6 +181,9 @@ def main():
     fr_name = fr_stem(stem) + "_FR.pdf"
     fr_path = os.path.join(target, fr_name)
     en_path = os.path.join(target, fr_stem(stem) + "_EN.pdf")
+    if en and os.path.normcase(en_path) == os.path.normcase(os.path.join(target, os.path.basename(src))):
+        fail(f"la version anglaise écraserait le livret d'origine ({en_path}) — renommer l'original, "
+             "par exemple « <nom>_EN_original.pdf », puis relancer")
     for p in [fr_path] + ([en_path] if en else []):
         if os.path.exists(p) and not replace:
             fail(f"{p} existe déjà — relancer avec --remplacer pour l'écraser")
