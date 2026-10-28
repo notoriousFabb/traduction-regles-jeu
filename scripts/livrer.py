@@ -10,6 +10,8 @@ Usage : python -X utf8 livrer.py "<Ludothèque>/_outils/<Jeu>" [--langue X] [--e
    « Jeu ENG Rules.pdf » → « Jeu Rules_FR.pdf ») puis range de nouveau ;
    spec bilingue (LANGUE lu dans l'environnement, textes X("fr", "en")) : construit aussi l'anglais
    (LANGUE=en) et le copie en <Jeu>/<nom>_EN.pdf ;
+Un livret livré qui atteint 10 Mo est signalé : au-delà, il ne passe pas sur Discord, et une version allégée est
+à proposer à l'utilisateur (comprimer.py) — le livret en pleine qualité, lui, reste tel quel.
 5. ajoute ou met à jour la ligne du jeu dans l'index _outils/LISEZMOI.md (langue et éditeur : options, sinon lus
    dans NOTES.md) et signale un NOTES.md manquant.
 Avec --encre : construit et livre en plus <nom>_FR_encre.pdf, version économe en encre à imprimer (fond sombre
@@ -45,6 +47,17 @@ def fr_stem(stem):
     s = LANG_WORD.sub("", s)
     s = re.sub(r"([ _\-.])[ _\-.]+", r"\1", s).strip(" _-.")
     return s or stem
+
+
+DISCORD = 10e6  # au-dessus, un fichier ne passe pas sur Discord : une version allégée est à proposer
+
+
+def signaler_poids(path):
+    """Livret trop lourd pour Discord : le dire, pour qu'une version allégée soit proposée à l'utilisateur."""
+    n = os.path.getsize(path)
+    if n >= DISCORD:
+        print(f"ATTENTION : {os.path.basename(path)} fait {n / 1e6:.1f} Mo, au-dessus des 10 Mo de Discord — "
+              f'proposer une version allégée : python -X utf8 comprimer.py "{path}"')
 
 
 def fail(msg):
@@ -124,6 +137,7 @@ def livrer_pdf(tools, jeu, ludo, target, replace):
         if f:
             shutil.copy(f, os.path.join(target, f"{stem}_{lg}.pdf"))
             print(f"traduction -> {os.path.join(target, f'{stem}_{lg}.pdf')}")
+            signaler_poids(os.path.join(target, f"{stem}_{lg}.pdf"))
     typ = opt("--type") or "recréé"
     indexer(ludo, jeu, tools, typ + (" (FR + EN)" if pdfs["EN"] else "") + (" + encre" if pdfs["FR_encre"] else ""))
 
@@ -213,6 +227,7 @@ def main():
     tail = out[out.find("À VÉRIFIER"):] if "À VÉRIFIER" in out else ""
     shutil.copy(os.path.join(tools, "sortie.pdf"), fr_path)
     print(f"traduction -> {fr_path}")
+    signaler_poids(fr_path)
     if en:  # même spec, textes anglais : X("fr", "en") avec LANGUE=en
         code, out = run([engine, "sortie_en.pdf"], tools, langue="en")
         if code or "ERREUR" in out:
@@ -222,6 +237,7 @@ def main():
             if os.path.exists(os.path.join(tools, f)):
                 os.remove(os.path.join(tools, f))
         print(f"version anglaise -> {en_path}")
+        signaler_poids(en_path)
     if encre:  # même spec, fond sombre retiré : version à imprimer
         code, out = run([engine, "sortie_encre.pdf", "--fond-clair"], tools)
         if code or "ERREUR" in out:
@@ -230,6 +246,7 @@ def main():
         if os.path.exists(os.path.join(tools, "sortie_encre_journal.txt")):
             os.remove(os.path.join(tools, "sortie_encre_journal.txt"))
         print(f"version économe en encre -> {encre_path}")
+        signaler_poids(encre_path)
     print(run(["ranger.py", tools], tools)[1].splitlines()[-1])
 
     # 5. index

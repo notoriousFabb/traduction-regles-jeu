@@ -69,6 +69,8 @@ un livret à problème est mis de côté et signalé.
    Sans spec.py (page web recréée, livret recomposé) : `livrer.py "<outils>" --original "<livret>"
    --pdf <fr.pdf> [--pdf-en <en.pdf>] [--pdf-encre <encre.pdf>] --type "<type>"`.
    Termes généraux nouveaux → `references/glossaire.md`. Résumer : fichiers, vocabulaire, compromis.
+   - **Livret d'au moins 10 Mo** (`livrer.py` le signale) : proposer une version allégée pour Discord, jamais
+     la faire d'office — `references/alleger.md` ; le livret en pleine qualité est gardé tel quel.
 
 ## Économiser les jetons
 - Images : une planche à 70-80 dpi pour voir, puis seulement des **zooms sur une zone** (`clip=`) pour vérifier ;

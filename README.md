@@ -24,6 +24,7 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
 - [Livrets scannés](#livrets-scannés)
 - [Règles sur une page web](#règles-sur-une-page-web)
 - [Version économe en encre](#version-économe-en-encre)
+- [Version allégée pour Discord](#version-allégée-pour-discord)
 - [Contrôles automatiques et relecture](#contrôles-automatiques-et-relecture)
 - [Coût en jetons et modèles](#coût-en-jetons-et-modèles)
 - [Corriger une traduction déjà faite](#corriger-une-traduction-déjà-faite)
@@ -54,6 +55,8 @@ After You Betobeto-san, The Final Bosses' Blues et Man Eating House (anglais).
   remplacé par le français, ou traduction placée à côté de chaque page.
 - **Contrôle son propre travail** : texte oublié, chevauchements, débordements, fautes, termes du glossaire non
   respectés, paragraphes anormalement courts.
+- **Signale un livret trop lourd pour Discord** (10 Mo) et propose une version allégée, en gardant le livret en
+  pleine qualité intact.
 - **Produit une version économe en encre** d'un livret à fond sombre, si on la demande : même mise en page, fond
   blanc, texte foncé, illustrations intactes.
 - **Fait aussi la version anglaise** si on la demande (utile pour un livret japonais) : la même spec contient
@@ -271,6 +274,21 @@ Les livrets scannés ne sont pas couverts. Détails : `references/encre.md`.
 
 ---
 
+## Version allégée pour Discord
+Discord refuse un fichier de plus de 10 Mo, et c'est là que les livrets sont publiés la plupart du temps. À la
+livraison, un livret qui atteint 10 Mo est signalé ; la skill **propose** alors une version allégée, sans jamais
+la faire d'office. Sous 10 Mo, rien n'est signalé.
+
+`comprimer.py` écrit `<nom>_FR_light.pdf` à côté du livret. **Le livret en pleine qualité n'est ni touché ni
+remplacé** : la version allégée est un fichier de plus, à n'envoyer que sur Discord. Les essais vont du plus
+doux au plus serré et s'arrêtent au premier qui passe sous la limite : nettoyage seul, puis images recompressées
+en JPEG (qualité 92, 85, 80…), puis résolution des images très fines ramenée à 300, 220, 170 dpi…
+
+Le **texte reste du texte** : vectoriel, il n'est jamais touché et reste net à l'écran comme à l'impression. Le
+script le vérifie page par page après coup. Détails : `references/alleger.md`.
+
+---
+
 ## Contrôles automatiques et relecture
 **Pendant la construction** (`build.py`, `scan.py`, `controle.py`) :
 - **TEXTE NON TRADUIT** : toute ligne d'origine ni remplacée ni volontairement ignorée (`IGNORE`) est listée.
@@ -334,6 +352,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `scan.md` : livrets scannés (lecture automatique, zones, rendus) ;
   - `recomposer.md` : livret recomposé à neuf, sans l'image du scan ;
   - `encre.md` : version économe en encre d'un livret à fond sombre, à imprimer (sur demande seulement) ;
+  - `alleger.md` : version allégée sous 10 Mo pour Discord (sur proposition, livret d'origine conservé) ;
   - `page-web.md` : règles publiées sur une page web (page traduite puis remise en PDF ; page bilingue,
     version anglaise) ;
   - `en-ligne.md` : livret seulement consultable en ligne (Google Drive) : où chercher le PDF, captures de
@@ -355,6 +374,7 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
   - `icone.py` : découpe une icône d'un scan pour la remettre dans le texte français ;
   - `sheet.py` / `side.py` : planche d'aperçu et images côte à côte original / français ;
   - `relecture.py` : relecture du texte seul ; `encre.py` : version économe en encre d'un livret à fond sombre ;
+    `comprimer.py` : version allégée sous 10 Mo pour Discord ;
   - `page_web.py` : texte d'une page web à traduire, et page française reconstruite ;
   - `livrer.py` : livraison (version anglaise comprise ; `--encre` pour la version économe en encre ; `--pdf`
     pour une traduction faite sans spec) ;
@@ -373,6 +393,8 @@ modifie `spec.py`, reconstruit, regarde la page, puis remplace `<nom>_FR.pdf` **
 - **Lecture automatique des scans** : Windows uniquement ; ailleurs, Claude lit les pages en images (plus cher).
 - **Livrets très longs** : la traduction se fait page par page dans une même session, ce qui reste coûteux ;
   mieux vaut le savoir avant de commencer un livret de 40 pages.
+- **Version allégée** : un livret presque entièrement fait de grandes images peut rester au-dessus de 10 Mo même
+  au dernier essai ; il faut alors l'envoyer en deux fichiers.
 - **Version économe en encre** : pas pour les livrets scannés, où le fond EST l'image scannée. Un fond fait de
   nombreux petits pavés, ou posé avec une matrice tournée, est signalé dans le journal plutôt que forcé.
 

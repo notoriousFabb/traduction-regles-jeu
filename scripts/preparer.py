@@ -20,9 +20,9 @@ import pymupdf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TEXT_SCRIPTS = ["build.py", "commun.py", "controle.py", "dump.py", "polices.py", "side.py", "ranger.py",
-                "livrer.py", "relecture.py", "encre.py"]
+                "livrer.py", "relecture.py", "encre.py", "comprimer.py"]
 SCAN_SCRIPTS = ["scan.py", "controle.py", "grille.py", "bandes.py", "icone.py", "side.py", "ranger.py", "livrer.py",
-                "ocr.py", "relecture.py"]
+                "ocr.py", "relecture.py", "comprimer.py"]
 SYMBOLS = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts", "seguisym.ttf")  # ①❶◆★ des scans
 NON_LATIN = re.compile(r"[Ͱ-῿　-鿿가-힯＀-￯]")  # grec, cyrillique, CJK…
 RESERVED = {"CON", "PRN", "AUX", "NUL"} | {f"COM{i}" for i in range(1, 10)} | {f"LPT{i}" for i in range(1, 10)}
