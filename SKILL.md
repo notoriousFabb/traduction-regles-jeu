@@ -1,6 +1,6 @@
 ---
 name: traduction-regles-jeu
-description: Traduit en français (et en anglais si demandé) un livret de règles de jeu de société en PDF, depuis n'importe quelle langue, en conservant la mise en page — polices, images, icônes, tableaux, positions — et produit un `*_FR.pdf` ; gère aussi les livrets scannés. À utiliser dès que l'utilisateur demande de traduire des règles, un livret, un rulebook ou un PDF de jeu (même « traduis-moi ce PDF » ou un nom comme `xxx_rulebook.pdf`, `Spielregel.pdf`), ou de corriger une traduction déjà faite ainsi.
+description: Traduit en français (et en anglais si demandé) un livret de règles de jeu de société en PDF, depuis n'importe quelle langue, en conservant la mise en page — polices, images, icônes, tableaux, positions — et produit un `*_FR.pdf` ; gère aussi les livrets scannés. À utiliser dès que l'utilisateur demande de traduire des règles, un livret, un rulebook ou un PDF de jeu (même « traduis-moi ce PDF » ou un nom comme `xxx_rulebook.pdf`, `Spielregel.pdf`), ou de corriger une traduction déjà faite ainsi. Fait aussi, à la demande, l'aide-mémoire d'une page d'un jeu (mise en place, tour de jeu, score) à poser sur la table.
 ---
 
 # Traduction de livrets de règles (toutes langues → FR, mise en page conservée)
@@ -71,6 +71,11 @@ un livret à problème est mis de côté et signalé.
    Termes généraux nouveaux → `references/glossaire.md`. Résumer : fichiers, vocabulaire, compromis.
    - **Livret d'au moins 10 Mo** (`livrer.py` le signale) : proposer une version allégée pour Discord, jamais
      la faire d'office — `references/alleger.md` ; le livret en pleine qualité est gardé tel quel.
+
+## Aide-mémoire d'une page (à la demande)
+« Fais l'aide-mémoire de <jeu> » : une page A4 en français (mise en place, tour de jeu, fin de partie et score,
+pièges), d'après le texte du livret, rangée en `<Jeu>/<nom>_aide-memoire.pdf` — `references/aide-memoire.md`.
+Jamais d'office ; après une traduction, ne pas la proposer à chaque fois.
 
 ## Économiser les jetons
 - Images : une planche à 70-80 dpi pour voir, puis seulement des **zooms sur une zone** (`clip=`) pour vérifier ;
