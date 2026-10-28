@@ -73,13 +73,13 @@ def _section(s):
 
 def _css(polices, corps, titre, taille):
     return polices + f"""
-    * {{ margin: 0; padding: 0; }}
+    body, div, p, h2, ol, ul, li {{ margin: 0; padding: 0; }}  /* MuPDF ignore « * » : marges par défaut sinon */
     body {{ font-family: {corps}; font-size: {taille}pt; line-height: 1.3; color: {ENCRE}; }}
     .sec {{ margin-bottom: {taille * 0.9}pt; }}
     .accent {{ background-color: {FOND}; padding: {taille * 0.6}pt {taille * 0.8}pt; }}
     h2 {{ font-family: {titre}; font-size: {taille * 1.3}pt; font-weight: bold; margin-bottom: {taille * 0.35}pt;
           padding-bottom: {taille * 0.15}pt; border-bottom: 0.6pt solid {FILET}; }}
-    ol, ul {{ margin-left: {taille * 0.4}pt; }}
+    ol, ul {{ padding-left: {taille * 1.6}pt; }}
     li {{ margin-bottom: {taille * 0.25}pt; }}
     p {{ margin-bottom: {taille * 0.3}pt; }}
     p.def {{ padding-bottom: {taille * 0.25}pt; border-bottom: 0.4pt solid {FILET}; }}
@@ -139,7 +139,7 @@ def _tete_html(d, polices, corps, titre):
             + (f'<p class="infos">{_texte(d["infos"])}</p>' if d.get("infos") else "")
             + (f'<p class="but"><b>But du jeu.</b> {_texte(d["but"])}</p>' if d.get("but") else ""))
     css = polices + f"""
-      * {{ margin: 0; padding: 0; }}
+      body, p, h1 {{ margin: 0; padding: 0; }}
       body {{ font-family: {corps}; color: {ENCRE}; }}
       .eti {{ font-size: 7.5pt; font-weight: bold; color: {GRIS}; letter-spacing: 1pt; text-transform: uppercase; }}
       h1 {{ font-family: {titre}; font-size: 24pt; line-height: 1.1; margin: 1pt 0 2pt; }}
@@ -171,7 +171,8 @@ def construire(json_path, sortie, livret=None, apercu=None):
     dev = w.begin_page(A4)
     tete, css_tete = _tete_html(d, polices, corps, titre)
     st = pymupdf.Story(html=tete, user_css=css_tete, archive=archive)
-    st.place(pymupdf.Rect(x_tete, MARGE, A4.width - MARGE, MARGE + HAUT_TETE - 8))
+    if st.place(pymupdf.Rect(x_tete, MARGE, A4.width - MARGE, MARGE + HAUT_TETE - 8))[0]:
+        print("ATTENTION : en-tête trop long, la fin est coupée — raccourcir « infos » ou « but »")
     st.draw(dev)
     _poser(sections, taille, _css(polices, corps, titre, taille), archive, dev)
     w.end_page()
@@ -182,8 +183,9 @@ def construire(json_path, sortie, livret=None, apercu=None):
     page = doc[0]
     if livret:
         r = pymupdf.Rect(MARGE, MARGE, MARGE + vw, MARGE + vh)
-        with pymupdf.open(livret) as src:
-            page.show_pdf_page(r, src, 0)
+        with pymupdf.open(livret) as src:  # en image : la page en vecteurs emporte toutes ses polices (8 Mo)
+            pix = src[0].get_pixmap(dpi=round(3 * 72 * vh / src[0].rect.height))  # ~3 px par point
+        page.insert_image(r, stream=pix.tobytes("jpeg", jpg_quality=85))
         page.draw_rect(r, color=(0.8, 0.8, 0.82), width=0.5)
     y = MARGE + HAUT_TETE - 4
     page.draw_line((MARGE, y), (A4.width - MARGE, y), color=(0.25, 0.25, 0.28), width=1.2)
@@ -192,6 +194,7 @@ def construire(json_path, sortie, livret=None, apercu=None):
     page.insert_text((MARGE, A4.height - MARGE + 6), pied, fontsize=6.5, color=(0.45, 0.45, 0.5))
     doc.set_metadata({"title": f"{d['titre']} — aide-mémoire", "creator": "regles-jeu"})
     os.makedirs(os.path.dirname(os.path.abspath(sortie)), exist_ok=True)
+    doc.subset_fonts()  # polices entières sinon (1 Mo pour une page)
     doc.save(sortie, garbage=3, deflate=True)
     if apercu:
         page.get_pixmap(dpi=80).save(apercu)
