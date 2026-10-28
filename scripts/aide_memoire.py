@@ -14,7 +14,7 @@ aide-memoire.json (rédigé par Claude d'après le livret, voir references/aide-
         {"titre": "Mise en place", "etapes": ["…", "…"]},           liste numérotée
         {"titre": "Tour de jeu", "etapes": ["…"]},
         {"titre": "Fin de manche et score", "points": ["…"]},       liste à puces
-        {"titre": "Cartes spéciales", "tableau": [["Joker", "…"]]}, deux colonnes : nom, effet
+        {"titre": "Cartes spéciales", "tableau": [["Joker", "…"]]}, une ligne « nom : effet » par carte
         {"titre": "À ne pas oublier", "points": ["…"], "accent": true}   encadré
       ],
       "source": "Livret CMYK_Rules_FR.pdf, p. 2-5"
@@ -64,9 +64,8 @@ def _section(s):
         h += "<ol>" + "".join(f"<li>{_texte(x)}</li>" for x in s["etapes"]) + "</ol>"
     if s.get("points"):
         h += "<ul>" + "".join(f"<li>{_texte(x)}</li>" for x in s["points"]) + "</ul>"
-    if s.get("tableau"):
-        h += "<table>" + "".join(f"<tr><td class='n'>{_texte(a)}</td><td>{_texte(b)}</td></tr>"
-                                 for a, b in s["tableau"]) + "</table>"
+    if s.get("tableau"):  # une ligne « Nom : effet » par entrée (les <table> de MuPDF font chevaucher les colonnes)
+        h += "".join(f'<p class="def"><b>{_texte(a)}</b> : {_texte(b)}</p>' for a, b in s["tableau"])
     if s.get("texte"):
         h += f"<p>{_texte(s['texte'])}</p>"
     return f'<div class="sec{" accent" if s.get("accent") else ""}">{h}</div>'
@@ -83,9 +82,7 @@ def _css(polices, corps, titre, taille):
     ol, ul {{ margin-left: {taille * 0.4}pt; }}
     li {{ margin-bottom: {taille * 0.25}pt; }}
     p {{ margin-bottom: {taille * 0.3}pt; }}
-    table {{ border-collapse: collapse; width: 100%; }}
-    td {{ padding: {taille * 0.2}pt {taille * 0.4}pt {taille * 0.2}pt 0; vertical-align: top; border-bottom: 0.4pt solid {FILET}; }}
-    td.n {{ font-weight: bold; width: 30%; }}
+    p.def {{ padding-bottom: {taille * 0.25}pt; border-bottom: 0.4pt solid {FILET}; }}
     b {{ font-weight: bold; }}
     """
 

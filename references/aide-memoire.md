@@ -47,5 +47,5 @@ python -X utf8 <skill>/scripts/aide_memoire.py "<Ludothèque>/_outils/<Jeu>/aide
 
 `<nom>` : celui du livret français (`CMYK_Rules` pour `CMYK_Rules_FR.pdf`), suffixe `_aide-memoire.pdf`, rangé
 avec les livrets du jeu. L'app de la ludothèque le reconnaît à ce suffixe et l'ouvre depuis la fiche du jeu.
-Ajouter une ligne « Aide-mémoire : fait le <date> » dans `NOTES.md`. Résumer à l'utilisateur : fichier, taille du
+Ajouter une ligne « Aide-mémoire : fait le <date> » à la fin de `NOTES.md` avec l'outil d'édition (pas `printf` ni `echo`). Résumer à l'utilisateur : fichier, taille du
 texte, ce qui a été laissé de côté.
