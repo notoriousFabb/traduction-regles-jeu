@@ -15,7 +15,7 @@ dans une autre langue à alphabet latin installée)
 - livret scanné : planche d'aperçu et lecture automatique du texte (ocr.py -> zones.py) si la langue est installée ;
 - cherche dans l'index et les NOTES.md des jeux déjà traduits ceux qui utilisent les mêmes polices.
 Affiche un résumé à lire avant d'écrire le spec."""
-import os, re, shutil, subprocess, sys
+import json, os, re, shutil, subprocess, sys
 import pymupdf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -110,7 +110,7 @@ def main():
     scan = len(text.strip()) < 30 * len(doc) and (covered >= len(doc) or vecteur)
     rel = os.path.relpath(pdf, tools).replace("\\", "/").split("/")
     src_line = "SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), " + \
-               ", ".join(repr(x).replace("'", '"') for x in rel) + ")"
+               ", ".join(json.dumps(x, ensure_ascii=False) for x in rel) + ")"  # pas repr : apostrophe (Buccaneers' Code)
 
     for f in (SCAN_SCRIPTS if scan else TEXT_SCRIPTS):
         shutil.copy(os.path.join(HERE, f), tools)
