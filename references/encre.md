@@ -26,7 +26,10 @@ Sans spec.py (livret recomposé, page web) : `livrer.py … --pdf sortie.pdf --p
 
 ## Ce que fait le traitement (`encre.py`)
 Page par page, et **seulement sur les pages jugées sombres** (clarté médiane basse ; une page déjà claire est
-laissée telle quelle, le journal le dit) :
+laissée telle quelle, le journal le dit) ;
+la **couverture** (page 0) est gardée telle quelle par défaut : son illustration couvre la page et serait
+retirée comme un fond. `ENCRE_GARDER = {0, 7}` dans `spec.py` change la liste (`set()` pour éclaircir aussi la
+couverture, si elle n'est qu'un fond uni) :
 - l'**image** qui couvre la page n'est plus peinte : le papier blanc reste ;
 - les grands **aplats** sombres qui couvrent la page deviennent du blanc franc (aucune encre) ;
 - toute autre couleur voit sa **clarté inversée à teinte constante** : filet clair → filet foncé, pastille

@@ -39,6 +39,7 @@ IGNORE = getattr(spec, "IGNORE", {})
 AVANT_TEXTE = getattr(spec, "AVANT_TEXTE", None)  # f(page, pno, log) : dessin sous le français (bandeau élargi…)
 INCLINEES = getattr(spec, "INCLINEES", [])  # [(page, texte d'origine, français)] : étiquettes penchées
 CONTOURS = getattr(spec, "CONTOURS", {})  # {page: [(x0, y0, x1, y1)]} : lettres doublées d'un contour en tracés
+ENCRE_GARDER = set(getattr(spec, "ENCRE_GARDER", {0}))  # --fond-clair : pages gardées telles quelles (couverture : son illustration couvre la page et serait prise pour un fond)
 ENCRE = "--fond-clair" in sys.argv  # version économe en encre : fond sombre retiré, couleurs claires foncées
 ARGS = [a for a in sys.argv[1:] if not a.startswith("--")]
 OUT = ARGS[0] if ARGS else "out_fr.pdf"
@@ -621,9 +622,10 @@ for pno in {p for p, en, fr in INCLINEES} | set(CONTOURS):
 
 for pno, flows in sorted(by_page.items()):
     page = doc[pno]
-    CLAIR = ENCRE and encre.sombre(src[pno])
+    CLAIR = ENCRE and pno not in ENCRE_GARDER and encre.sombre(src[pno])
     if ENCRE and not CLAIR:
-        log.append(f"page {pno} : déjà claire, laissée telle quelle")
+        log.append(f"page {pno} : " + ("gardée telle quelle (ENCRE_GARDER)" if pno in ENCRE_GARDER
+                                       else "déjà claire, laissée telle quelle"))
     lines_of = page_lines(pno)
     XL, XR = column(pno, lines_of)
     auto = pno not in COLUMNS and "*" not in COLUMNS
