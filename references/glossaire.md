@@ -1,7 +1,8 @@
 # Glossaire retenu (cohérence entre les jeux)
 
 Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à un jeu va dans son
-`_outils/<Jeu>/NOTES.md` (voir SKILL.md), pas ici.
+`_outils/<Jeu>/NOTES.md` (voir SKILL.md), pas ici. Termes propres à des jeux déjà traduits, sortis d'ici :
+`glossaire-jeux.md` (à reprendre si l'on retraduit l'un de ces jeux).
 
 | Anglais | Français |
 |---|---|
@@ -17,32 +18,16 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | unused deck (cartes écartées, non jouées) | paquet non utilisé (choix de l'utilisateur, pas « talon ») |
 | rank / suit | valeur / couleur |
 | score / scoring / score pile | marquer / décompte / pile de score |
-| bid (Numberwang) / auction (Vazerneiros) | annonce / enchère |
-| prediction / bidding tokens (Fright Factor) | pronostic / jetons Pronostic |
+| bid / auction | annonce / enchère |
 | Wild | Joker |
 | set / run | série / suite |
-| hypothesis (tableau) / loose card | hypothèse (tableau) / carte isolée |
 | face up / face down | face visible / face cachée |
 | clockwise | dans le sens horaire |
 | player board / point tokens | plateau joueur / jetons de points |
 | player indicator card / token | carte / jeton Joueur |
-| fuel rods / spent / unspent | barres de combustible / dépensées / non dépensées |
-| Lost in time / Safe / Perfect journey / Inoperative | Perdu dans le temps / Voyage réussi / Voyage parfait / Hors service |
-| Scariness token / Fright Track / Scariest Monster | jeton Effroi / Piste de la Peur / Monstre le Plus Effrayant |
-| Zombie Hand | Main de Zombie |
-| Science / Researcher / Validation / Specialty cards | cartes Science / Chercheur / Validation / Spécialité |
-| Physics / Chemistry / Math / Biology | Physique / Chimie / Maths / Biologie |
-| prestige | prestige |
-| Rumor / Character cards | cartes Rumeur / Personnage |
-| Potion / Suit tokens, Hierarchy Track | jetons Potion / Couleur, piste de Hiérarchie |
-| Barbarians / Druids / Mages / Paladins | Barbares / Druides / Mages / Paladins |
-| appeal / drunkenness points (This is from that customer…, JP アピール / 酩酊) | points de Charme / points d'Ivresse |
-| drink cards / water card / bartender (idem, お酒 / 水 / バーテン) | cartes Boisson / carte Eau / Barman |
-| restriction / binding (Shinobi Blade, JP 縛り) | contrainte (de couleur / de nombre) |
-| high risk / low risk betting zones (JP ハイリスク / ローリスク) | zone Risque élevé / Risque faible |
+| restriction / binding (JP 縛り) | contrainte (de couleur / de nombre) |
 | lead color | couleur demandée |
 | Must Follow (rule) | obligation de suivre (choix de l'utilisateur, pas « obligation de fournir ») |
-| Team cards (Pack Tricks) | cartes Équipe |
 | Trump Suit Indicator | indicateur d'atout |
 | Starting / Initial Lead Player | premier meneur |
 | dealer | donneur |
@@ -53,7 +38,6 @@ Termes généraux, réutilisables d'un jeu à l'autre. Le vocabulaire propre à 
 | Must-Not-Follow | interdit de suivre |
 | may follow (JP メイフォロー) | fournir facultatif |
 | bid (JP ビッド) | annonce |
-| bust (dépasser 21) | « vous sautez (Bust) ! » |
 
 ## Équivalences dans d'autres langues
 Termes de base des jeux de plis ; renvoient au français du tableau ci-dessus. Compléter à chaque jeu.
